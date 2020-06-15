@@ -1,6 +1,6 @@
 const histoty = {
   action: null,
-  direction: null,
+  direction: 'init',
 };
 
 export default histoty;

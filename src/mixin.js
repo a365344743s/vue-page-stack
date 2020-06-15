@@ -8,33 +8,33 @@ let eventRegister = function(router) {
   const routerBack = router.back.bind(router);
   const routerForward = router.forward.bind(router);
 
-  router.push = (location, onResolve, onReject) => {
+  router.push = (location, direction, onResolve, onReject) => {
     history.action = config.pushName;
-    history.direction = config.forwardName;
+    history.direction = direction || config.forwardName;
     return routerPush(location, onResolve, onReject);
   };
 
-  router.go = n => {
+  router.go = ({ index, direction }) => {
     history.action = config.goName;
-    history.direction = n < 0 ? config.backName : config.forwardName;
-    routerGo(n);
+    history.direction = direction || (index < 0 ? config.backName : config.forwardName);
+    routerGo(index);
   };
 
-  router.replace = (location, onResolve, onReject) => {
+  router.replace = (location, direction, onResolve, onReject) => {
     history.action = config.replaceName;
-    history.direction = location.back ? config.backName : config.forwardName;
+    history.direction = direction || config.forwardName;
     return routerReplace(location, onResolve, onReject);
   };
 
-  router.back = () => {
+  router.back = direction => {
     history.action = config.backName;
-    history.direction = config.backName;
+    history.direction = direction || config.backName;
     routerBack();
   };
 
-  router.forward = () => {
+  router.forward = direction => {
     history.action = config.forwardName;
-    history.direction = config.forwardName;
+    history.direction = direction || config.forwardName;
     routerForward();
   };
 };
