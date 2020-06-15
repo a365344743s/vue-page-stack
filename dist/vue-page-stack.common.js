@@ -1488,7 +1488,7 @@ var es6_number_constructor = __webpack_require__("c5f6");
 // CONCATENATED MODULE: ./src/history.js
 var histoty = {
   action: null,
-  direction: null
+  direction: 'init'
 };
 /* harmony default export */ var src_history = (histoty);
 // CONCATENATED MODULE: ./src/config/config.js
@@ -1610,33 +1610,35 @@ var mixin_eventRegister = function eventRegister(router) {
   var routerBack = router.back.bind(router);
   var routerForward = router.forward.bind(router);
 
-  router.push = function (location, onResolve, onReject) {
+  router.push = function (location, direction, onResolve, onReject) {
     src_history.action = config.pushName;
-    src_history.direction = config.forwardName;
+    src_history.direction = direction || config.forwardName;
     return routerPush(location, onResolve, onReject);
   };
 
-  router.go = function (n) {
+  router.go = function (_ref) {
+    var index = _ref.index,
+        direction = _ref.direction;
     src_history.action = config.goName;
-    src_history.direction = n < 0 ? config.backName : config.forwardName;
-    routerGo(n);
+    src_history.direction = direction || (index < 0 ? config.backName : config.forwardName);
+    routerGo(index);
   };
 
-  router.replace = function (location, onResolve, onReject) {
+  router.replace = function (location, direction, onResolve, onReject) {
     src_history.action = config.replaceName;
-    src_history.direction = location.back ? config.backName : config.forwardName;
+    src_history.direction = direction || config.forwardName;
     return routerReplace(location, onResolve, onReject);
   };
 
-  router.back = function () {
+  router.back = function (direction) {
     src_history.action = config.backName;
-    src_history.direction = config.backName;
+    src_history.direction = direction || config.backName;
     routerBack();
   };
 
-  router.forward = function () {
+  router.forward = function (direction) {
     src_history.action = config.forwardName;
-    src_history.direction = config.forwardName;
+    src_history.direction = direction || config.forwardName;
     routerForward();
   };
 };
@@ -1695,7 +1697,22 @@ VuePageStackPlugin.install = function (Vue, _ref) {
         replace: replace
       });
     } else {
-      to.params[keyName + '-dir'] = src_history.direction;
+      var direction = src_history.direction;
+
+      if (direction !== null) {
+        to.params[keyName + '-dir'] = direction;
+      } else {
+        var key = to.query[keyName];
+        var index = getIndexByKey(key);
+
+        if (index === -1) {
+          to.params[keyName + '-dir'] = config.forwardName;
+        } else {
+          to.params[keyName + '-dir'] = config.backName;
+        }
+      }
+
+      src_history.direction = null;
       next({
         params: to.params
       });
