@@ -29,13 +29,13 @@ let eventRegister = function(router) {
   router.back = direction => {
     history.action = config.backName;
     history.direction = direction || config.backName;
-    routerBack();
+    routerGo(-1);
   };
 
   router.forward = direction => {
     history.action = config.forwardName;
     history.direction = direction || config.forwardName;
-    routerForward();
+    routerGo(1);
   };
 };
 
